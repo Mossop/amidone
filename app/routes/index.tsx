@@ -1,60 +1,30 @@
 import type { MetaFunction } from "@remix-run/node";
 
-import clsx from "clsx";
-import { useMemo, useState } from "react";
-
-import { useAppContext } from "~/components/AppContext";
+import { useBlocks, useGridDimensions } from "~/components/AppContext";
 import Block from "~/components/Block";
-import { Metrics } from "~/modules/layout";
+import RenderManager from "~/components/RenderManager";
 
 export const meta: MetaFunction = () => [{ title: "Am I Done Yet?" }];
 
 export default function Index() {
-  let appContext = useAppContext();
-
-  let metricCells = useMemo(() => {
-    let cells: string[] = [];
-
-    cells.push("col1");
-    if (appContext.columns > 1) {
-      cells.push("col2");
-    }
-    cells.push("row2");
-
-    return cells;
-  }, [appContext.columns]);
-
-  let [metrics] = useState<Metrics | null>(null);
+  let { columns, rowHeight } = useGridDimensions();
+  let blocks = useBlocks();
 
   return (
     <main>
-      <div
-        className="metrics blockgrid"
-        style={{
-          gridTemplateColumns: `repeat(${appContext.columns}, 1fr)`,
-          gridAutoRows: `${appContext.rowHeight}px`,
-        }}
-      >
-        {metricCells.map((c) => (
-          <div key={c} className={c} />
-        ))}
-      </div>
-      <div
-        className={clsx("blocks", metrics ? "fixed" : "blockgrid")}
-        style={{
-          gridTemplateColumns: `repeat(${appContext.columns}, 1fr)`,
-          gridAutoRows: `${appContext.rowHeight}px`,
-        }}
-      >
-        {appContext.layouts.map((blockLayout) => (
-          <Block
-            key={blockLayout.id}
-            metrics={metrics}
-            layout={blockLayout}
-            config={appContext.blockConfigs[blockLayout.id]}
-          />
-        ))}
-      </div>
+      <RenderManager>
+        <div
+          className="blocks blockgrid"
+          style={{
+            gridTemplateColumns: `repeat(${columns}, 1fr)`,
+            gridAutoRows: `${rowHeight}px`,
+          }}
+        >
+          {blocks.map(([id, block]) => (
+            <Block key={id} id={id} config={block} />
+          ))}
+        </div>
+      </RenderManager>
     </main>
   );
 }

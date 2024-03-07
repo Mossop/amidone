@@ -1,41 +1,73 @@
-import { useMemo } from "react";
+import SlIconButton from "@shoelace-style/shoelace/dist/react/icon-button/index.js";
+import { useCallback, useEffect, useState } from "react";
 
+import { useBlockConfigSetter } from "./AppContext";
+import {
+  useBlockStyles,
+  useRenderContext,
+  useRenderControls,
+} from "./RenderManager";
 import { BlockConfig } from "../modules/config";
-import { BlockLayout, Metrics, getPosition } from "~/modules/layout";
 
 export default function Block({
-  layout,
+  id,
   config,
-  metrics,
 }: {
-  layout: BlockLayout;
+  id: string;
   config: BlockConfig;
-  metrics?: Metrics | null;
 }) {
-  let styles = useMemo((): React.CSSProperties => {
-    if (metrics) {
-      return getPosition(
-        metrics,
-        layout.x,
-        layout.y,
-        config.width,
-        config.height,
-      );
+  let styles = useBlockStyles(id, config);
+  let [element, setElement] = useState<HTMLDivElement | null>(null);
+
+  let setBlockConfig = useBlockConfigSetter(id);
+  let renderContext = useRenderContext();
+
+  let updateWidth = useCallback(
+    async (width: number) => {
+      renderContext.inFixedRendering(() => {
+        setBlockConfig((previousConfig) => ({
+          ...previousConfig,
+          width,
+        }));
+      });
+    },
+    [renderContext, setBlockConfig],
+  );
+
+  let grow = useCallback(() => {
+    updateWidth(config.width + 1);
+  }, [updateWidth, config.width]);
+
+  let shrink = useCallback(() => {
+    if (config.width > 1) {
+      updateWidth(config.width - 1);
+    }
+  }, [updateWidth, config.width]);
+
+  let { lockRendering, unlockRendering } = useRenderControls();
+
+  useEffect(() => {
+    if (element) {
+      element.addEventListener("transitionrun", lockRendering);
+      element.addEventListener("transitionend", unlockRendering);
+
+      return () => {
+        element!.removeEventListener("transitionrun", lockRendering);
+        element!.removeEventListener("transitionend", unlockRendering);
+      };
     }
 
-    return {
-      gridColumnStart: layout.x + 1,
-      gridColumnEnd: `span ${config.width}`,
-      gridRowStart: layout.y + 1,
-      gridRowEnd: `span ${config.height}`,
-    };
-  }, [layout, config, metrics]);
+    return undefined;
+  }, [element, lockRendering, unlockRendering]);
 
   return (
-    <div className="block" style={styles}>
+    <div className="block" style={styles} ref={setElement}>
       <div className="title">
         <h1>{config.title}</h1>
-        <div className="buttons" />
+        <div className="buttons">
+          <SlIconButton name="dash-circle" onClick={shrink} />
+          <SlIconButton name="plus-circle" onClick={grow} />
+        </div>
       </div>
       <div className="content">Hi</div>
     </div>

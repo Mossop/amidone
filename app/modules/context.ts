@@ -6,6 +6,18 @@ export abstract class BaseContext extends EventTarget {
   }
 }
 
+export function useContextChange<C extends BaseContext>(context: C) {
+  let [, setState] = useState({});
+
+  let updater = useCallback(() => setState({}), []);
+
+  useEffect(() => {
+    context.addEventListener("change", updater);
+
+    return () => context.removeEventListener("change", updater);
+  }, [context, updater]);
+}
+
 export function useContextProperty<C extends BaseContext, R>(
   context: C,
   cb: (context: C, previous: R | undefined) => R,
@@ -30,7 +42,10 @@ export function contextHook<C extends BaseContext, R>(
   contextGetter: () => C,
   cb: (context: C, previous: R | undefined) => R,
 ): () => R {
-  return () => useContextProperty(contextGetter(), cb);
+  return () =>
+    useContextProperty(contextGetter(), (context, previous) =>
+      cb(context, previous),
+    );
 }
 
 export function contextPropertyHook<C extends BaseContext, P extends keyof C>(

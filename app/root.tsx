@@ -5,11 +5,17 @@ import {
   Scripts,
   ScrollRestoration,
 } from "@remix-run/react";
+import { setBasePath } from "@shoelace-style/shoelace/dist/utilities/base-path.js";
 
 import ConfigProvider from "./components/AppContext";
 import { Config } from "./modules/config";
 
+import "@shoelace-style/shoelace/dist/themes/light.css";
 import "./styles/main.scss";
+
+setBasePath(
+  "https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.14.0/cdn/",
+);
 
 const CONFIG: Config = {
   columns: 4,

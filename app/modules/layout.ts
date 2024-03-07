@@ -2,8 +2,9 @@ import type { AppContext } from "~/components/AppContext";
 
 import { BlockConfig } from "./config";
 
+type Grid = boolean[];
+
 export interface BlockLayout {
-  id: string;
   x: number;
   y: number;
 }
@@ -26,12 +27,28 @@ function* coords(
   }
 }
 
+export function buildGrid(
+  startX: number,
+  startY: number,
+  width: number,
+  height: number,
+  columns: number,
+): Grid {
+  let grid: Grid = [];
+
+  for (let coord of coords(startX, startY, width, height, columns)) {
+    grid[coord] = true;
+  }
+
+  return grid;
+}
+
 function findLayout(
-  grid: boolean[],
+  grid: Grid,
   context: AppContext,
   blockId: string,
   block: BlockConfig,
-): BlockLayout {
+): [string, BlockLayout] {
   let width = Math.min(block.width, context.columns);
 
   let startY = 0;
@@ -57,11 +74,13 @@ function findLayout(
           grid[coord] = true;
         }
 
-        return {
-          id: blockId,
-          x: startX,
-          y: startY,
-        };
+        return [
+          blockId,
+          {
+            x: startX,
+            y: startY,
+          },
+        ];
       }
     }
 
@@ -69,14 +88,14 @@ function findLayout(
   }
 }
 
-export function initialLayout(
+export function layout(
   context: AppContext,
-  blocks: string[],
-): BlockLayout[] {
-  let grid: boolean[] = [];
-
-  return blocks.map((blockId) =>
-    findLayout(grid, context, blockId, context.blockConfigs[blockId]),
+  grid: Grid = [],
+): Record<string, BlockLayout> {
+  return Object.fromEntries(
+    context.blockLayout.map((blockId) =>
+      findLayout(grid, context, blockId, context.blockConfigs[blockId]),
+    ),
   );
 }
 
@@ -120,7 +139,7 @@ export function getPosition(
   y: number,
   width: number,
   height: number,
-): React.CSSProperties {
+): { top: number; left: number; width: number; height: number } {
   return {
     top: metrics.offsetY + y * (metrics.rowHeight + metrics.rowGap),
     left: metrics.offsetX + x * (metrics.columnWidth + metrics.columnGap),

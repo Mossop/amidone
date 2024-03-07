@@ -8,21 +8,19 @@ main {
 .blockgrid {
   display: grid;
   width: 100%;
-  gap: 10px;
-  padding-inline: 10px;
-  padding-block-start: 10px;
+  gap: var(--sl-spacing-x-small);
+  padding: var(--sl-spacing-x-small);
 }
 
 .blocks {
   position: absolute;
   inset: 0;
 
-  &.fixed .block {
-    position: absolute;
-  }
-
   .block {
     border: 1px solid black;
+    transition-property: width, height, top, left;
+    transition-timing-function: ease-in-out;
+    transition-duration: var(--sl-transition-slow);
 
     & > .title {
       background: rgb(200, 200, 200);
