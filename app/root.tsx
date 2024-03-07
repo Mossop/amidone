@@ -6,6 +6,69 @@ import {
   ScrollRestoration,
 } from "@remix-run/react";
 
+import ConfigProvider from "./components/AppContext";
+import { Config } from "./modules/config";
+
+import "./styles/main.scss";
+
+const CONFIG: Config = {
+  columns: 4,
+  rowHeight: 200,
+  blockLayout: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+  blocks: {
+    "1": {
+      title: "1",
+      width: 2,
+      height: 2,
+    },
+    "2": {
+      title: "2",
+      width: 1,
+      height: 1,
+    },
+    "3": {
+      title: "3",
+      width: 3,
+      height: 2,
+    },
+    "4": {
+      title: "4",
+      width: 1,
+      height: 1,
+    },
+    "5": {
+      title: "5",
+      width: 1,
+      height: 1,
+    },
+    "6": {
+      title: "6",
+      width: 1,
+      height: 2,
+    },
+    "7": {
+      title: "7",
+      width: 1,
+      height: 1,
+    },
+    "8": {
+      title: "8",
+      width: 1,
+      height: 1,
+    },
+    "9": {
+      title: "9",
+      width: 1,
+      height: 1,
+    },
+    "10": {
+      title: "10",
+      width: 1,
+      height: 1,
+    },
+  },
+};
+
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
@@ -16,7 +79,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
-        {children}
+        <ConfigProvider config={CONFIG}>{children}</ConfigProvider>
         <ScrollRestoration />
         <Scripts />
       </body>

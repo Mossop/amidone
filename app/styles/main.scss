@@ -1,0 +1,22 @@
+@use "reset";
+
+#gridroot {
+  display: grid;
+  width: 100vw;
+  gap: 10px;
+  padding-inline: 10px;
+  padding-block-start: 10px;
+}
+
+.block {
+  border: 1px solid black;
+
+  & > .title {
+    background: rgb(200, 200, 200);
+    border-bottom: 1px solid black;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
