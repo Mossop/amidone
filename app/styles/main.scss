@@ -1,22 +1,54 @@
 @use "reset";
 
-#gridroot {
-  display: grid;
+main {
+  display: relative;
   width: 100vw;
+}
+
+.blockgrid {
+  display: grid;
+  width: 100%;
   gap: 10px;
   padding-inline: 10px;
   padding-block-start: 10px;
 }
 
-.block {
-  border: 1px solid black;
+.blocks {
+  position: absolute;
+  inset: 0;
 
-  & > .title {
-    background: rgb(200, 200, 200);
-    border-bottom: 1px solid black;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
+  &.fixed .block {
+    position: absolute;
+  }
+
+  .block {
+    border: 1px solid black;
+
+    & > .title {
+      background: rgb(200, 200, 200);
+      border-bottom: 1px solid black;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+    }
+  }
+}
+
+.metrics {
+  position: absolute;
+  inset: 0;
+
+  .col1 {
+    grid-column-start: 1;
+  }
+
+  .col2 {
+    grid-column-start: 2;
+  }
+
+  .row2 {
+    grid-column-start: 1;
+    grid-row-start: 2;
   }
 }
