@@ -7,16 +7,16 @@ export const meta: MetaFunction = () => [{ title: "Am I Done Yet?" }];
 
 interface GridCssProperties extends React.CSSProperties {
   "--grid-columns": number;
-  "--grid-row-height": string;
+  "--grid-rows": number;
 }
 
 export default function Index() {
-  let { columns, rowHeight } = useGridDimensions();
+  let { columns, rows } = useGridDimensions();
   let blocks = useBlocks();
 
   let style: GridCssProperties = {
     "--grid-columns": columns,
-    "--grid-row-height": `${rowHeight}px`,
+    "--grid-rows": rows,
   };
 
   return (

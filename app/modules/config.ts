@@ -6,7 +6,7 @@ export interface BlockConfig {
 
 export interface Config {
   columns: number;
-  rowHeight: number;
+  rows: number;
 
   blockLayout: string[];
   blocks: Record<string, BlockConfig>;

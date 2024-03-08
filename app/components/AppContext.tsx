@@ -21,7 +21,7 @@ import { BlockLayout, layout } from "~/modules/layout";
 export class AppContext extends BaseContext {
   columns: number;
 
-  rowHeight: number;
+  rows: number;
 
   blockLayout: string[];
 
@@ -33,7 +33,7 @@ export class AppContext extends BaseContext {
     super();
 
     this.columns = 3;
-    this.rowHeight = 200;
+    this.rows = 4;
     this.blockLayout = [];
     this.layouts = {};
 
@@ -44,7 +44,7 @@ export class AppContext extends BaseContext {
 
   setConfig(config: Config) {
     this.columns = config.columns;
-    this.rowHeight = config.rowHeight;
+    this.rows = config.rows;
 
     this.blockConfigs = config.blocks;
     this.blockLayout = config.blockLayout;
@@ -89,13 +89,13 @@ export function useBlockConfigSetter(
   );
 }
 
-export function useGridDimensions(): { columns: number; rowHeight: number } {
+export function useGridDimensions(): { columns: number; rows: number } {
   let context = useAppContext();
   useContextChange(context);
 
   return useMemo(
-    () => ({ columns: context.columns, rowHeight: context.rowHeight }),
-    [context.columns, context.rowHeight],
+    () => ({ columns: context.columns, rows: context.rows }),
+    [context.columns, context.rows],
   );
 }
 

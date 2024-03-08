@@ -19,7 +19,7 @@ setBasePath(
 
 const CONFIG: Config = {
   columns: 4,
-  rowHeight: 200,
+  rows: 4,
   blockLayout: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
   blocks: {
     "1": {
@@ -85,6 +85,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
+        <header>Hello</header>
         <ConfigProvider config={CONFIG}>{children}</ConfigProvider>
         <ScrollRestoration />
         <Scripts />
