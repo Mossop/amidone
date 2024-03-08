@@ -1,52 +1,49 @@
 @use "reset";
 
 main {
-  display: relative;
   width: 100vw;
+
+  --row-gap: var(--sl-spacing-x-small);
+  --col-gap: var(--sl-spacing-x-small);
+
+  --col-width: calc(calc(100% - var(--col-gap)) / var(--grid-columns));
+  --row-height: calc(var(--grid-row-height) + var(--row-gap));
 }
 
 .blockgrid {
-  display: grid;
   width: 100%;
-  gap: var(--sl-spacing-x-small);
-  padding: var(--sl-spacing-x-small);
-}
-
-.blocks {
-  position: absolute;
-  inset: 0;
+  position: relative;
 
   .block {
+    position: absolute;
+    top: calc(var(--row-gap) + calc(var(--block-y) * var(--row-height)));
+    left: calc(var(--col-gap) + calc(var(--block-x) * var(--col-width)));
+
+    height: calc(
+      calc(var(--block-height) * var(--row-height)) - var(--row-gap)
+    );
+    width: calc(calc(var(--block-width) * var(--col-width)) - var(--col-gap));
+
     border: 1px solid black;
     transition-property: width, height, top, left;
     transition-timing-function: ease-in-out;
     transition-duration: var(--sl-transition-slow);
 
-    & > .title {
+    & > .header {
       background: rgb(200, 200, 200);
       border-bottom: 1px solid black;
       display: flex;
       flex-direction: row;
       align-items: center;
       justify-content: space-between;
+      padding-inline: var(--sl-spacing-2x-small);
+
+      .title {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: var(--sl-spacing-2x-small);
+      }
     }
-  }
-}
-
-.metrics {
-  position: absolute;
-  inset: 0;
-
-  .col1 {
-    grid-column-start: 1;
-  }
-
-  .col2 {
-    grid-column-start: 2;
-  }
-
-  .row2 {
-    grid-column-start: 1;
-    grid-row-start: 2;
   }
 }

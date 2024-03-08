@@ -1,13 +1,16 @@
+import SlIcon from "@shoelace-style/shoelace/dist/react/icon/index.js";
 import SlIconButton from "@shoelace-style/shoelace/dist/react/icon-button/index.js";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback } from "react";
 
-import { useBlockConfigSetter } from "./AppContext";
-import {
-  useBlockStyles,
-  useRenderContext,
-  useRenderControls,
-} from "./RenderManager";
+import { useBlockConfigSetter, useBlockLayout } from "./AppContext";
 import { BlockConfig } from "../modules/config";
+
+interface BlockCssProperties extends React.CSSProperties {
+  "--block-x": number;
+  "--block-y": number;
+  "--block-width": number;
+  "--block-height": number;
+}
 
 export default function Block({
   id,
@@ -16,22 +19,16 @@ export default function Block({
   id: string;
   config: BlockConfig;
 }) {
-  let styles = useBlockStyles(id, config);
-  let [element, setElement] = useState<HTMLDivElement | null>(null);
-
   let setBlockConfig = useBlockConfigSetter(id);
-  let renderContext = useRenderContext();
 
   let updateWidth = useCallback(
-    async (width: number) => {
-      renderContext.inFixedRendering(() => {
-        setBlockConfig((previousConfig) => ({
-          ...previousConfig,
-          width,
-        }));
-      });
+    (width: number) => {
+      setBlockConfig((previousConfig) => ({
+        ...previousConfig,
+        width,
+      }));
     },
-    [renderContext, setBlockConfig],
+    [setBlockConfig],
   );
 
   let grow = useCallback(() => {
@@ -44,26 +41,21 @@ export default function Block({
     }
   }, [updateWidth, config.width]);
 
-  let { lockRendering, unlockRendering } = useRenderControls();
-
-  useEffect(() => {
-    if (element) {
-      element.addEventListener("transitionrun", lockRendering);
-      element.addEventListener("transitionend", unlockRendering);
-
-      return () => {
-        element!.removeEventListener("transitionrun", lockRendering);
-        element!.removeEventListener("transitionend", unlockRendering);
-      };
-    }
-
-    return undefined;
-  }, [element, lockRendering, unlockRendering]);
+  let layout = useBlockLayout(id);
+  let styles: BlockCssProperties = {
+    "--block-x": layout.x,
+    "--block-y": layout.y,
+    "--block-width": config.width,
+    "--block-height": config.height,
+  };
 
   return (
-    <div className="block" style={styles} ref={setElement}>
-      <div className="title">
-        <h1>{config.title}</h1>
+    <div className="block" style={styles}>
+      <div className="header">
+        <div className="title">
+          <SlIcon name="grip-vertical" />
+          <h1>{config.title}</h1>
+        </div>
         <div className="buttons">
           <SlIconButton name="dash-circle" onClick={shrink} />
           <SlIconButton name="plus-circle" onClick={grow} />
