@@ -2,7 +2,7 @@ import type { AppContext } from "~/components/AppContext";
 
 import { BlockConfig } from "./config";
 
-type Grid = boolean[];
+type Grid = string[];
 
 export interface BlockLayout {
   x: number;
@@ -27,38 +27,22 @@ function* coords(
   }
 }
 
-export function buildGrid(
-  startX: number,
-  startY: number,
-  width: number,
-  height: number,
-  columns: number,
-): Grid {
-  let grid: Grid = [];
-
-  for (let coord of coords(startX, startY, width, height, columns)) {
-    grid[coord] = true;
-  }
-
-  return grid;
-}
-
 function findLayout(
   grid: Grid,
-  context: AppContext,
+  columns: number,
   blockId: string,
   block: BlockConfig,
-): [string, BlockLayout] {
-  let width = Math.min(block.width, context.columns);
+): BlockLayout {
+  let width = Math.min(block.width, columns);
 
   let startY = 0;
   // eslint-disable-next-line no-constant-condition
   while (true) {
-    for (let startX = 0; startX <= context.columns - width; startX++) {
+    for (let startX = 0; startX <= columns - width; startX++) {
       let available = true;
 
       let blockCoords = [
-        ...coords(startX, startY, width, block.height, context.columns),
+        ...coords(startX, startY, width, block.height, columns),
       ];
 
       for (let coord of blockCoords) {
@@ -71,16 +55,13 @@ function findLayout(
       if (available) {
         for (let coord of blockCoords) {
           // eslint-disable-next-line no-param-reassign
-          grid[coord] = true;
+          grid[coord] = blockId;
         }
 
-        return [
-          blockId,
-          {
-            x: startX,
-            y: startY,
-          },
-        ];
+        return {
+          x: startX,
+          y: startY,
+        };
       }
     }
 
@@ -90,11 +71,55 @@ function findLayout(
 
 export function layout(
   context: AppContext,
-  grid: Grid = [],
-): Record<string, BlockLayout> {
-  return Object.fromEntries(
-    context.blockLayout.map((blockId) =>
-      findLayout(grid, context, blockId, context.blockConfigs[blockId]),
-    ),
-  );
+  blocks: string[],
+  fixedBlock?: string,
+  fixedLayout?: BlockLayout,
+): [string[], Record<string, BlockLayout>] {
+  let layouts: Record<string, BlockLayout> = {};
+  let grid: Grid = [];
+
+  if (fixedBlock && fixedLayout) {
+    layouts[fixedBlock] = fixedLayout;
+    let config = context.blockConfigs[fixedBlock];
+
+    for (let coord of coords(
+      fixedLayout.x,
+      fixedLayout.y,
+      config.width,
+      config.height,
+      context.columns,
+    )) {
+      grid[coord] = fixedBlock;
+    }
+  }
+
+  for (let blockId of blocks) {
+    layouts[blockId] = findLayout(
+      grid,
+      context.columns,
+      blockId,
+      context.blockConfigs[blockId],
+    );
+  }
+
+  let ids = new Set<string>();
+  let coord = 0;
+  let seenBlock = true;
+  while (seenBlock) {
+    seenBlock = false;
+
+    for (let x = 0; x < context.columns; x++) {
+      if (grid[coord + x]) {
+        ids.add(grid[coord + x]);
+        seenBlock = true;
+      }
+    }
+
+    coord += context.columns;
+  }
+
+  if (fixedBlock) {
+    return layout(context, [...ids]);
+  }
+  return [[...ids], layouts];
 }

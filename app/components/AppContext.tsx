@@ -47,20 +47,34 @@ export class AppContext extends BaseContext {
     this.rows = config.rows;
 
     this.blockConfigs = config.blocks;
-    this.blockLayout = config.blockLayout;
 
-    this.layouts = layout(this);
+    [this.blockLayout, this.layouts] = layout(this, config.blockLayout);
 
     this.changed();
   }
 
   setBlockConfig(blockId: string, config: BlockConfig) {
-    console.log("Updating block config");
+    let oldConfig = this.blockConfigs[blockId];
+    let newConfig = {
+      ...config,
+      width: Math.min(config.width, this.columns),
+    };
     this.blockConfigs = {
       ...this.blockConfigs,
-      [blockId]: config,
+      [blockId]: newConfig,
     };
-    this.layouts = layout(this);
+
+    if (
+      oldConfig.width != newConfig.width ||
+      oldConfig.height != newConfig.height
+    ) {
+      [this.blockLayout, this.layouts] = layout(
+        this,
+        this.blockLayout,
+        blockId,
+        this.layouts[blockId],
+      );
+    }
 
     this.changed();
   }
