@@ -1,6 +1,6 @@
 import SlIcon from "@shoelace-style/shoelace/dist/react/icon/index.js";
 import SlIconButton from "@shoelace-style/shoelace/dist/react/icon-button/index.js";
-import { useCallback } from "react";
+import { useCallback, useRef } from "react";
 
 import { useBlockConfigSetter, useBlockLayout } from "./AppContext";
 import { BlockConfig } from "../modules/config";
@@ -19,6 +19,7 @@ export default function Block({
   id: string;
   config: BlockConfig;
 }) {
+  let blockElement = useRef<HTMLDivElement | null>(null);
   let setBlockConfig = useBlockConfigSetter(id);
 
   let updateWidth = useCallback(
@@ -49,11 +50,24 @@ export default function Block({
     "--block-height": config.height,
   };
 
+  let dragStart = useCallback(
+    (event: React.DragEvent<HTMLDivElement>) => {
+      event.dataTransfer.setData("block/id", id);
+
+      if (blockElement.current) {
+        event.dataTransfer.setDragImage(blockElement.current, 0, 0);
+      }
+    },
+    [id],
+  );
+
   return (
-    <div className="block" style={styles}>
+    <div className="block" style={styles} ref={blockElement}>
       <div className="header">
         <div className="title">
-          <SlIcon name="grip-vertical" />
+          <div className="dragHandle" draggable onDragStart={dragStart}>
+            <SlIcon name="grip-vertical" />
+          </div>
           <h1>{config.title}</h1>
         </div>
         <div className="buttons">

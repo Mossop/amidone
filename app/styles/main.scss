@@ -79,6 +79,10 @@ main {
       justify-content: space-between;
       padding-inline: var(--sl-spacing-2x-small);
 
+      .dragHandle {
+        cursor: grab;
+      }
+
       .title {
         display: flex;
         flex-direction: row;
