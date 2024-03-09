@@ -143,7 +143,7 @@ function DropTargets({
 export default function Index() {
   let { columns, rows, height } = useGridDimensions();
   let blocks = useBlocks();
-  let [dragging, setDragging] = useState(false);
+  let [dragging, setDragging] = useState<string | null>(null);
   let context = useAppContext();
 
   let style: GridCssProperties = {
@@ -160,7 +160,7 @@ export default function Index() {
         return;
       }
 
-      setDragging(true);
+      setDragging(blockId);
       context.startDragging(blockId);
     },
     [context],
@@ -179,7 +179,7 @@ export default function Index() {
         return;
       }
 
-      setDragging(false);
+      setDragging(null);
       context.endDragging();
     },
     [context],
@@ -203,7 +203,12 @@ export default function Index() {
     <main style={style} onDragStart={onDragStart} onDragEnd={onDragEnd}>
       <div key="grid" className="blockgrid">
         {blocks.map(([id, block]) => (
-          <Block key={id} id={id} config={block} />
+          <Block
+            key={id}
+            id={id}
+            config={block}
+            isDragging={dragging ? dragging == id : null}
+          />
         ))}
         {dragging && (
           <DropTargets

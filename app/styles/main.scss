@@ -53,17 +53,6 @@ main {
   height: calc(calc(var(--row-height) * var(--grid-height)) + var(--row-gap));
   position: relative;
 
-  .block {
-    position: absolute;
-    top: calc(var(--row-gap) + calc(var(--block-y) * var(--row-height)));
-    left: calc(var(--col-gap) + calc(var(--block-x) * var(--col-width)));
-
-    height: calc(
-      calc(var(--block-height) * var(--row-height)) - var(--row-gap)
-    );
-    width: calc(calc(var(--block-width) * var(--col-width)) - var(--col-gap));
-  }
-
   .droptarget {
     position: absolute;
     top: calc(
@@ -78,12 +67,26 @@ main {
   }
 
   .block {
+    position: absolute;
+    top: calc(var(--row-gap) + calc(var(--block-y) * var(--row-height)));
+    left: calc(var(--col-gap) + calc(var(--block-x) * var(--col-width)));
+
+    height: calc(
+      calc(var(--block-height) * var(--row-height)) - var(--row-gap)
+    );
+    width: calc(calc(var(--block-width) * var(--col-width)) - var(--col-gap));
+
+    opacity: 1;
     background-color: rgb(var(--background));
     border: 1px solid var(--sl-color-primary-500);
     border-radius: var(--sl-border-radius-small);
-    transition-property: width, height, top, left;
+    transition-property: width, height, top, left, opacity;
     transition-timing-function: ease-in-out;
     transition-duration: var(--sl-transition-slow);
+
+    &.fade {
+      opacity: 0.3;
+    }
 
     & > .header {
       background: var(--sl-color-primary-200);

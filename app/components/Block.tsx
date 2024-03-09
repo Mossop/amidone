@@ -1,5 +1,6 @@
 import SlIcon from "@shoelace-style/shoelace/dist/react/icon/index.js";
 import SlIconButton from "@shoelace-style/shoelace/dist/react/icon-button/index.js";
+import clsx from "clsx";
 import { useCallback, useRef } from "react";
 
 import { useBlockConfigSetter, useBlockLayout } from "./AppContext";
@@ -17,9 +18,11 @@ export interface BlockCssProperties extends React.CSSProperties {
 export default function Block({
   id,
   config,
+  isDragging,
 }: {
   id: string;
   config: BlockConfig;
+  isDragging: boolean | null;
 }) {
   let blockElement = useRef<HTMLDivElement | null>(null);
   let setBlockConfig = useBlockConfigSetter(id);
@@ -64,7 +67,11 @@ export default function Block({
   );
 
   return (
-    <div className="block" style={styles} ref={blockElement}>
+    <div
+      className={clsx("block", isDragging === false && "fade")}
+      style={styles}
+      ref={blockElement}
+    >
       <div className="header">
         <div className="title">
           <div className="dragHandle" draggable onDragStart={dragStart}>
