@@ -18,6 +18,15 @@ import {
 } from "~/modules/context";
 import { BlockLayout, layout } from "~/modules/layout";
 
+interface DragSession {
+  blockId: string;
+  config: BlockConfig;
+  layout: BlockLayout;
+  originalLayout: string[];
+  x: number | null;
+  y: number | null;
+}
+
 export class AppContext extends BaseContext {
   columns: number;
 
@@ -31,6 +40,8 @@ export class AppContext extends BaseContext {
 
   blockConfigs: Record<string, BlockConfig> = {};
 
+  dragSession: DragSession | null = null;
+
   constructor(config?: Config) {
     super();
 
@@ -43,6 +54,82 @@ export class AppContext extends BaseContext {
     if (config) {
       this.setConfig(config);
     }
+  }
+
+  startDragging(blockId: string) {
+    this.dragSession = {
+      blockId,
+      config: this.blockConfigs[blockId],
+      layout: this.layouts[blockId],
+      originalLayout: this.blockLayout,
+      x: null,
+      y: null,
+    };
+  }
+
+  dragOver(x: number, y: number) {
+    if (!this.dragSession) {
+      return;
+    }
+
+    if (this.dragSession.x == x && this.dragSession.y == y) {
+      return;
+    }
+
+    this.dragSession.x = x;
+    this.dragSession.y = y;
+
+    [this.blockLayout, this.layouts, this.height] = layout(
+      this,
+      this.dragSession.originalLayout,
+      this.dragSession.blockId,
+      {
+        x: Math.min(x, this.columns - this.dragSession.config.width),
+        y,
+      },
+    );
+
+    this.changed();
+  }
+
+  dragLeave(x: number, y: number) {
+    if (!this.dragSession) {
+      return;
+    }
+
+    if (this.dragSession.x != x || this.dragSession.y != y) {
+      return;
+    }
+
+    this.dragSession.x = null;
+    this.dragSession.y = null;
+
+    [this.blockLayout, this.layouts, this.height] = layout(
+      this,
+      this.dragSession.originalLayout,
+    );
+
+    this.changed();
+  }
+
+  drop(x: number, y: number) {
+    this.dragOver(x, y);
+
+    this.dragSession = null;
+  }
+
+  endDragging() {
+    if (!this.dragSession) {
+      return;
+    }
+
+    [this.blockLayout, this.layouts, this.height] = layout(
+      this,
+      this.dragSession.originalLayout,
+    );
+    this.dragSession = null;
+
+    this.changed();
   }
 
   setConfig(config: Config) {
@@ -88,11 +175,9 @@ export class AppContext extends BaseContext {
 
 const Context = createContext<AppContext>(new AppContext());
 
-function useAppContext(): AppContext {
+export function useAppContext(): AppContext {
   return useContext(Context);
 }
-
-export const useGridHeight = contextPropertyHook(useAppContext, "height");
 
 export function useBlockConfigSetter(
   blockId: string,
@@ -111,13 +196,21 @@ export function useBlockConfigSetter(
   );
 }
 
-export function useGridDimensions(): { columns: number; rows: number } {
+export function useGridDimensions(): {
+  columns: number;
+  rows: number;
+  height: number;
+} {
   let context = useAppContext();
   useContextChange(context);
 
   return useMemo(
-    () => ({ columns: context.columns, rows: context.rows }),
-    [context.columns, context.rows],
+    () => ({
+      columns: context.columns,
+      rows: context.rows,
+      height: context.height,
+    }),
+    [context.columns, context.rows, context.height],
   );
 }
 

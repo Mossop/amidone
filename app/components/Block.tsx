@@ -5,7 +5,9 @@ import { useCallback, useRef } from "react";
 import { useBlockConfigSetter, useBlockLayout } from "./AppContext";
 import { BlockConfig } from "../modules/config";
 
-interface BlockCssProperties extends React.CSSProperties {
+export const BLOCK_DRAG_TYPE = "block/id";
+
+export interface BlockCssProperties extends React.CSSProperties {
   "--block-x": number;
   "--block-y": number;
   "--block-width": number;
@@ -52,7 +54,7 @@ export default function Block({
 
   let dragStart = useCallback(
     (event: React.DragEvent<HTMLDivElement>) => {
-      event.dataTransfer.setData("block/id", id);
+      event.dataTransfer.setData(BLOCK_DRAG_TYPE, id);
 
       if (blockElement.current) {
         event.dataTransfer.setDragImage(blockElement.current, 0, 0);

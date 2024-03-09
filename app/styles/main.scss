@@ -57,13 +57,28 @@ main {
     position: absolute;
     top: calc(var(--row-gap) + calc(var(--block-y) * var(--row-height)));
     left: calc(var(--col-gap) + calc(var(--block-x) * var(--col-width)));
-    background-color: rgb(var(--background));
 
     height: calc(
       calc(var(--block-height) * var(--row-height)) - var(--row-gap)
     );
     width: calc(calc(var(--block-width) * var(--col-width)) - var(--col-gap));
+  }
 
+  .droptarget {
+    position: absolute;
+    top: calc(
+      calc(var(--row-gap) / 2) + calc(var(--block-y) * var(--row-height))
+    );
+    left: calc(
+      calc(var(--col-gap) / 2) + calc(var(--block-x) * var(--col-width))
+    );
+
+    height: calc(var(--block-height) * var(--row-height));
+    width: calc(var(--block-width) * var(--col-width));
+  }
+
+  .block {
+    background-color: rgb(var(--background));
     border: 1px solid var(--sl-color-primary-500);
     border-radius: var(--sl-border-radius-small);
     transition-property: width, height, top, left;

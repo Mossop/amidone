@@ -94,6 +94,10 @@ export function layout(
   }
 
   for (let blockId of blocks) {
+    if (blockId == fixedBlock) {
+      continue;
+    }
+
     layouts[blockId] = findLayout(
       grid,
       context.columns,
