@@ -50,6 +50,7 @@ main {
 
 .blockgrid {
   width: 100%;
+  height: calc(calc(var(--row-height) * var(--grid-height)) + var(--row-gap));
   position: relative;
 
   .block {

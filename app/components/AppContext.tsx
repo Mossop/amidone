@@ -23,6 +23,8 @@ export class AppContext extends BaseContext {
 
   rows: number;
 
+  height: number;
+
   blockLayout: string[];
 
   layouts: Record<string, BlockLayout>;
@@ -36,6 +38,7 @@ export class AppContext extends BaseContext {
     this.rows = 4;
     this.blockLayout = [];
     this.layouts = {};
+    this.height = 0;
 
     if (config) {
       this.setConfig(config);
@@ -48,7 +51,10 @@ export class AppContext extends BaseContext {
 
     this.blockConfigs = config.blocks;
 
-    [this.blockLayout, this.layouts] = layout(this, config.blockLayout);
+    [this.blockLayout, this.layouts, this.height] = layout(
+      this,
+      config.blockLayout,
+    );
 
     this.changed();
   }
@@ -68,7 +74,7 @@ export class AppContext extends BaseContext {
       oldConfig.width != newConfig.width ||
       oldConfig.height != newConfig.height
     ) {
-      [this.blockLayout, this.layouts] = layout(
+      [this.blockLayout, this.layouts, this.height] = layout(
         this,
         this.blockLayout,
         blockId,
@@ -85,6 +91,8 @@ const Context = createContext<AppContext>(new AppContext());
 function useAppContext(): AppContext {
   return useContext(Context);
 }
+
+export const useGridHeight = contextPropertyHook(useAppContext, "height");
 
 export function useBlockConfigSetter(
   blockId: string,

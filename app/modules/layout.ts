@@ -74,7 +74,7 @@ export function layout(
   blocks: string[],
   fixedBlock?: string,
   fixedLayout?: BlockLayout,
-): [string[], Record<string, BlockLayout>] {
+): [string[], Record<string, BlockLayout>, number] {
   let layouts: Record<string, BlockLayout> = {};
   let grid: Grid = [];
 
@@ -121,5 +121,6 @@ export function layout(
   if (fixedBlock) {
     return layout(context, [...ids]);
   }
-  return [[...ids], layouts];
+
+  return [[...ids], layouts, coord / context.columns - 1];
 }
